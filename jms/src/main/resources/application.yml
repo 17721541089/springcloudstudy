@@ -1,0 +1,6 @@
+spring:
+  artemis:
+    host:              #--代理主机
+    post:              #--代理端口
+    user:              #--用于访问代理的用户 可选
+    password:          #--用于访问代理的密码 可选

@@ -1,0 +1,21 @@
+# 端口
+server:
+  port: 8090
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: host_route
+          uri: https://example.org
+          predicates:
+            - Path=/red/{segment},/blue/{segment}
+#h获取配置中心的路由
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+eureka:
+  client:
+    service-url:666
+      defaultZone: http://localhost:8761/eureka/

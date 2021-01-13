@@ -1,0 +1,106 @@
+匿名--我们说匿名，是因为它不像普通的方法那样有一个明确的名词，写的少而想得多
+函数--我们说它是函数，是应为Lambda函数不像方法那样属于摸个特定的类。但是方法一样，
+      Lambda有参数列表，函数主题、返回类型，还可能有可以抛出的异常列表
+传递--Lambda表达式可以作为参数传递给方法和存储在变量中
+简洁--无需向匿名类那样写很多模板代码
+
+(Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight());
+-------------------  -- -----------------------------------------
+  Lambda参数         箭头              Lambda主题
+
+先前：
+Comparator<Apple> byWeight = new Comparator<Apple>(){
+    public int compare(Apple a1, Apple a2){
+        return a1.getWeight().compareTo(a2.getWeight());
+    }
+}
+
+之后Lambda表达式：
+
+Comparator<Apple> byWeight = (Apple a1, Apple a2) -> a1.getWeight().compareTo(a2.getWeight());
+
+Lambda表达式例子解析：
+
+    (String s) -> s.length()
+    一个String类型的参数并返回一个int。Lambda没有return语句，因为已经隐含了return
+
+    (Apple a) -> a.getWeight() > 150
+    一个Apple类型的参数并返回一个boolean(苹果的重量是否超过150克）
+
+    （int x, int y) -> {
+        System.out.println("Result:");
+        System.out.println(x+y);
+    }
+    Lambda表达式具有两个int类型的参数，没有返回值（void返回）， Lambda表达式可以包含
+    多行语句，这里是两行，用{}包含
+
+    () -> 43
+    这是一个无参的Lambda表达式，返回一个int值
+
+Lambda表达式的基本语法：
+    (参数列表) -> 表达式
+    或者
+     (参数列表) -> {
+        n行语句;
+     }
+
+List<Apple> greenApples = filter(inventory,(Apple a) -> "green".equals(a.getColor));
+这上面的代码，Lambda表达式作为第二个参数传递给filter方法，因为它这里需要Predicate<T>,
+而这里一个函数式接口。
+
+
+函数式接口：
+    public interface Predicate<T>{
+        boolean test(T t)
+    }
+    一言以蔽之，函数式接口就只定义一个抽象的方法接口。
+    函数式接口能干啥呢？ Lambda表达式允许你直接以内联的形式为函数式接口的抽象方法提供实现
+    并把整个函数表达式作为函数接口的实例（具体来说，是函数接口一个具体实现的实例）。你用
+    匿名内部类也可以完成同样的事情，只不过比较笨拙：需要提供一个实现，然后在直接内联将它
+    实例化。
+    Runnable r1 = () -> System.out.println("hello world");    --使用Lambda
+
+    Runnable r1 = new Runnable(){                             --是用匿名类
+        public void run(){
+            System.out.println("hello world");
+        }
+    }
+
+把Lambda付诸实践：环绕执行模式
+    public static String processFile() throws IOException{
+        try(BufferedReader br = new BufferedReader(new FileReader("data.txt"))){
+                return br.readerLine(); --这是做有用工作的代码行
+        }
+    }
+
+第一步：记得行为参数化
+    processFile()的行为参数化。你需要把一种方法把行为传递给processFile(),以便它可以利用BufferedReader
+    执行不同的行为
+    传递行为是Lambda的拿手好戏。
+    一次读取两行
+    String result = processFile(BufferedReader br -> br.readerLine()+ br.readerLine());
+
+第二步：使用函数式接口来传递行为
+    我之前解释过，Lambda仅可用于上下文是函数式接口的情况。你需要创建一个能匹配BufferedReader ->String
+    还可以抛出IOException异常的接口
+    @FunctionalInterface
+    public interface BufferedReaderProcessor(){
+        String process(BufferedReader b)throws IOException;
+    }
+
+    现在你就可以把接口作为新的processFile方法的参数了
+    public static String processFile(BufferedReaderProcessor p) throws IOException{
+        try(BufferedReader br = new BufferedReader(new FileReader("data.txt"))){
+                    return p.process(br);
+            }
+    }
+
+
+
+
+
+
+
+
+
+
